@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة كوتش AI الطبية | استبيان الامتحان الوطني 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #070b14 0%, #111827 50%, #064e3b 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 min-h-screen">
+
+    <div class="max-w-2xl w-full glass-card rounded-3xl p-6 sm:p-10 text-center space-y-6 my-8">
+        
+        <!-- Header & Logo -->
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 text-3xl mb-1">
+            <i class="fa-solid fa-stethoscope"></i>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white via-sky-200 to-emerald-300">
+            منصة كوتش AI الطبية 🩺
+        </h1>
+
+        <p class="text-slate-300 text-sm leading-relaxed" id="mainDesc">
+            ساعدنا بتحديد أسلوب دراستك ونقاط تركيزك لنبني لك تجربة مراجعة واختبارات تفاعلية مخصصة 100%.
+        </p>
+
+        <!-- Live Countdown Timer -->
+        <div class="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-4 space-y-2">
+            <div class="text-xs text-emerald-400 font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-hourglass-half fa-spin"></i>
+                <span>الوقت المتبقي للامتحان الوطني (الموعد المتوقع: 20 ديسمبر 2026)</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 text-center pt-2" id="countdown">
+                <div class="bg-white/5 border border-white/10 p-2 rounded-xl">
+                    <span id="days" class="block text-xl sm:text-2xl font-black text-sky-300">00</span>
+                    <span class="text-[10px] text-slate-400">أيام</span>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-2 rounded-xl">
+                    <span id="hours" class="block text-xl sm:text-2xl font-black text-sky-300">00</span>
+                    <span class="text-[10px] text-slate-400">ساعات</span>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-2 rounded-xl">
+                    <span id="minutes" class="block text-xl sm:text-2xl font-black text-sky-300">00</span>
+                    <span class="text-[10px] text-slate-400">دقائق</span>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-2 rounded-xl">
+                    <span id="seconds" class="block text-xl sm:text-2xl font-black text-emerald-400">00</span>
+                    <span class="text-[10px] text-slate-400">ثواني</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div id="statusAlert" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
+
+        <!-- STEP 1: Registration Form -->
+        <form id="signupForm" class="space-y-4 text-right">
+            <div class="text-xs text-sky-300 font-bold border-b border-white/10 pb-2">الخطوة 1 من 2: البيانات الأولية</div>
+            <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">الاسم الكريم للزميل / الزميلة *</label>
+                <input type="text" id="fullName" required placeholder="د. أحمد الخالد" 
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">البريد الإلكتروني *</label>
+                <input type="email" id="email" required placeholder="doctor@example.com" 
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">الجامعة</label>
+                    <select id="university" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-emerald-400 transition">
+                        <option value="جامعة دمشق">جامعة دمشق</option>
+                        <option value="جامعة حلب">جامعة حلب</option>
+                        <option value="جامعة تشرين">جامعة تشرين</option>
+                        <option value="جامعة البعث">جامعة البعث</option>
+                        <option value="جامعة حماة">جامعة حماة</option>
+                        <option value="جامعة خاصة / أخرى">جامعة خاصة / أخرى</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">رقم الواتساب (اختياري)</label>
+                    <input type="tel" id="phone" placeholder="09xxxxxxxx" 
+                        class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition">
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" 
+                class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>المتابعة إلى الاستبيان المخصص</span>
+            </button>
+        </form>
+
+        <!-- STEP 2: Custom Medical Survey -->
+        <form id="surveyForm" class="hidden space-y-6 text-right">
+            <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300">
+                <i class="fa-solid fa-user-doctor ml-1"></i> أهلاً بك د. <span id="studentNameDisplay" class="font-bold"></span>! أجب عن الأسئلة التالية لنخصص لك تجربة المراجعة:
+            </div>
+
+            <!-- Q1 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-2">1. ما هو أسلوب التعلم والمراجعة المفضّل لديك؟ (يمكن اختيار أكثر من إجابة)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <label class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="learning_styles" value="بصري وشعاعي (مخططات وخرائط ذهنية وصور شعاعية)" class="mt-1 text-emerald-500 rounded">
+                        <span>👁️ <strong>بصري وشعاعي:</strong> مخططات وخرائط وصور شعاعية</span>
+                    </label>
+                    <label class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="learning_styles" value="قرائي وتلخيصي (نصوص ونقاط مفتاحية)" class="mt-1 text-emerald-500 rounded">
+                        <span>📖 <strong>قرائي وتلخيصي:</strong> نصوص ونقاط مفتاحية وتدوين</span>
+                    </label>
+                    <label class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="learning_styles" value="تفاعلي وحالات سريرية (سيناريوهات ومحاكاة)" class="mt-1 text-emerald-500 rounded">
+                        <span>🩺 <strong>تفاعلي وحالات:</strong> حل سيناريوهات مرضى ومحاكاة</span>
+                    </label>
+                    <label class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="learning_styles" value="سمعي وشروحات (مناقشات وشروح)" class="mt-1 text-emerald-500 rounded">
+                        <span>🎧 <strong>سمعي وشروحات:</strong> مناقشات صوتية وشروح مباشرة</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-2">2. متى تكون فترة ذروة تركيزك وانتاجيتك اليومية؟</label>
+                <select id="peakFocusTime" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-emerald-400 text-xs">
+                    <option value="🌅 صباحي مبكر (تركيز عالٍ في الساعات الأولى)">🌅 صباحي مبكر (تركيز عالٍ في الساعات الأولى)</option>
+                    <option value="🌙 مسائي / سهر ليلي (هدوء الليل وتركيز متواصل)">🌙 مسائي / سهر ليلي (هدوء الليل وتركيز متواصل)</option>
+                    <option value="⏱️ متقطع / بومودورو (25 دقيقة دراسة / 5 راحة)">⏱️ متقطع / بومودورو (25 دقيقة دراسة / 5 دقائق راحة)</option>
+                </select>
+            </div>
+
+            <!-- Q3 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-2">3. ما هي الأقسام والكتل التي تجدها أكثر صعوبة وتطلب تركيزاً مضاعفاً؟</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="difficult_subjects" value="الباطنية بمختلف فروعها" class="text-emerald-500 rounded">
+                        <span>🫀 الباطنية بمختلف فروعها</span>
+                    </label>
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="difficult_subjects" value="الجراحة العامة والتخصصية" class="text-emerald-500 rounded">
+                        <span>🔪 الجراحة العامة والتخصصية</span>
+                    </label>
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="difficult_subjects" value="الأطفال والتوليد والنسائية" class="text-emerald-500 rounded">
+                        <span>👶 الأطفال والتوليد والنسائية</span>
+                    </label>
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="difficult_subjects" value="الاختصاصات الصغرى" class="text-emerald-500 rounded">
+                        <span>👁️ الاختصاصات الصغرى</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Q4 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-2">4. ما هو نمط التحدي والتحفيز الذي يساعدك على الاستمرار؟</label>
+                <select id="motivationStyle" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-emerald-400 text-xs">
+                    <option value="🔥 تحدي قاسي وبند ناري (ضغط مكثف ومواعيد حازمة)">🔥 تحدي قاسي وبند ناري (ضغط مكثف ومواعيد حازمة)</option>
+                    <option value="🌱 تشجيع متدرج وهادئ (خطوات صغيرة وثقة منظمة)">🌱 تشجيع متدرج وهادئ (خطوات صغيرة وثقة منظمة)</option>
+                    <option value="🏆 تنافسي ولوحة شرف (مقارنة نقاط وتحفيز جماعي)">🏆 تنافسي ولوحة شرف (مقارنة نقاط وتحفيز جماعي)</option>
+                </select>
+            </div>
+
+            <!-- Q5 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-2">5. ماذا تحب أن تركز عليه في ملفات الاختبار التفاعلية (HTML) القادمة؟</label>
+                <div class="space-y-2 text-xs">
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="test_file_focus" value="سيناريوهات وحالات طويلة" class="text-emerald-500 rounded">
+                        <span>🚑 سيناريوهات وحالات طويلة</span>
+                    </label>
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="test_file_focus" value="دورات خاطفة وملاحظات سريعة" class="text-emerald-500 rounded">
+                        <span>⚡ دورات خاطفة وملاحظات سريعة</span>
+                    </label>
+                    <label class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 cursor-pointer hover:bg-white/10">
+                        <input type="checkbox" name="test_file_focus" value="مزيج متدرج بـ 4 مستويات" class="text-emerald-500 rounded">
+                        <span>📊 مزيج متدرج بـ 4 مستويات</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Q6 -->
+            <div>
+                <label class="block text-xs font-bold text-sky-200 mb-1">ملاحظات أو اقتراحات أخرى تحب إضافتها:</label>
+                <textarea id="additionalNotes" rows="3" placeholder="اكتب اقتراحاتك هنا..." 
+                    class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition"></textarea>
+            </div>
+
+            <button type="submit" id="surveyBtn" 
+                class="w-full py-4 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-600 hover:from-sky-400 hover:to-emerald-500 text-white font-bold shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>حفظ التفضيلات واستخراج التقرير</span>
+            </button>
+        </form>
+
+        <!-- STEP 3: Report Display -->
+        <div id="reportSection" class="hidden space-y-4 text-right">
+            <div class="p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/40 space-y-3">
+                <div class="text-emerald-400 font-bold text-base flex items-center gap-2 border-b border-white/10 pb-2">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>تقرير خطتك الدراسية في كوتش AI</span>
+                </div>
+                <div id="reportContent" class="text-xs space-y-2 text-slate-200 leading-relaxed"></div>
+            </div>
+
+            <<!-- الأزرار الجديدة: زر الشات الرئيسي + أزرار حفظ التقرير -->
+<div class="space-y-3 pt-2">
+    <!-- 1. الزر الرئيسي للانتقال المباشر للشات -->
+    <a href="../chat/index.html" 
+       class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition transform hover:-translate-y-0.5">
+        <i class="fa-solid fa-comments text-lg"></i>
+        <span>البدء بالدراسة والدردشة مع كوتش AI 💬</span>
+    </a>
+
+    <!-- 2. أزرار إضافية لنسخ وتصدير التقرير -->
+    <div class="flex gap-2">
+        <button type="button" onclick="copyReport()" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-copy"></i>
+            <span>نسخ التقرير</span>
+        </button>
+        <button type="button" onclick="downloadReportHTML()" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-code"></i>
+            <span>تصدير التقرير (HTML)</span>
+        </button>
+    </div>
+</div>
+                </button>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500">جميع الحقوق محفوظة © منصة كوتش AI الطبية 2026</p>
+    </div>
+
+    <!-- JavaScript & Logic -->
+    <script>
+        // 🛑 ضع بيانات مشروعك هنا بين التنصيص
+        const RAW_SUPABASE_URL = "https://kwvctwyydqrooqrwzssn.supabase.co/rest/v1/"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3dmN0d3l5ZHFyb29xcnd6c3NuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMjcyNTEsImV4cCI6MjEwNjgwMzI1MX0.9TdOHBb6AkN8QmYmzqQx8rmctQvhmnAvLyinv0Sy-oE";
+
+        // المعالج التلقائي لتفادي خطأ PGRST125
+        const SUPABASE_URL = RAW_SUPABASE_URL.trim().replace(/\/+$/, '').replace(/\/rest\/v1\/?$/, '');
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 🕒 العداد التنازلي التفاعلي إلى 20 ديسمبر 2026
+        const examDate = new Date('2026-12-20T00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = examDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').innerHTML = `<div class="col-span-4 text-emerald-400 font-bold text-sm">حان موعد الامتحان الوطني! بالتوفيق لجميع الأطباء! 🩺</div>`;
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = String(days).padStart(2, '0');
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 📝 إدارة إرسال البيانات والربط بـ Supabase
+        let userEmail = "";
+        let userName = "";
+
+        const signupForm = document.getElementById('signupForm');
+        const surveyForm = document.getElementById('surveyForm');
+        const reportSection = document.getElementById('reportSection');
+        const alertBox = document.getElementById('statusAlert');
+
+        // Step 1: Subscribers Table
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري حفظ البيانات...`;
+            alertBox.classList.add('hidden');
+
+            userName = document.getElementById('fullName').value.trim();
+            userEmail = document.getElementById('email').value.trim();
+            const university = document.getElementById('university').value;
+            const phone = document.getElementById('phone').value.trim();
+
+            try {
+                const { error } = await supabaseClient
+                    .from('subscribers')
+                    .insert([{ full_name: userName, email: userEmail, university: university, phone: phone }]);
+
+                if (error) throw error;
+
+                signupForm.classList.add('hidden');
+                document.getElementById('studentNameDisplay').innerText = userName;
+                surveyForm.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                alertBox.className = "p-4 rounded-xl text-sm font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation ml-1"></i> حدث خطأ: ${err.message || 'يرجى المحاولة لاحقاً.'}`;
+                alertBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-arrow-left"></i> <span>المتابعة إلى الاستبيان المخصص</span>`;
+            }
+        });
+
+        // Step 2: Custom Surveys Table
+        surveyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const surveyBtn = document.getElementById('surveyBtn');
+            surveyBtn.disabled = true;
+            surveyBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري إعداد وتخزين التقرير...`;
+
+            const learningStyles = Array.from(document.querySelectorAll('input[name="learning_styles"]:checked')).map(cb => cb.value);
+            const peakFocusTime = document.getElementById('peakFocusTime').value;
+            const difficultSubjects = Array.from(document.querySelectorAll('input[name="difficult_subjects"]:checked')).map(cb => cb.value);
+            const motivationStyle = document.getElementById('motivationStyle').value;
+            const testFileFocus = Array.from(document.querySelectorAll('input[name="test_file_focus"]:checked')).map(cb => cb.value);
+            const additionalNotes = document.getElementById('additionalNotes').value.trim();
+
+            const surveyData = {
+                full_name: userName,
+                email: userEmail,
+                learning_styles: learningStyles,
+                peak_focus_time: peakFocusTime,
+                difficult_subjects: difficultSubjects,
+                motivation_style: motivationStyle,
+                test_file_focus: testFileFocus,
+                additional_notes: additionalNotes
+            };
+
+            // الحفظ المحلي LocalStorage
+            localStorage.setItem(`coach_survey_${userEmail}`, JSON.stringify(surveyData));
+
+            try {
+                // الحفظ السحابي Supabase
+                const { error } = await supabaseClient
+                    .from('surveys')
+                    .insert([surveyData]);
+
+                if (error) throw error;
+
+                surveyForm.classList.add('hidden');
+
+                const reportHTML = `
+                    <p><strong>الطالب(ة):</strong> ${userName} (${userEmail})</p>
+                    <p><strong>أسلوب التعلم المفضّل:</strong> ${learningStyles.length ? learningStyles.join(' | ') : 'لم يحدد'}</p>
+                    <p><strong>ذروة التركيز والإنتاجية:</strong> ${peakFocusTime}</p>
+                    <p><strong>الكتل الأكثر صعوبة:</strong> ${difficultSubjects.length ? difficultSubjects.join(' | ') : 'لم يحدد'}</p>
+                    <p><strong>نمط التحدي والتحفيز:</strong> ${motivationStyle}</p>
+                    <p><strong>التركيز في ملفات الاختبار (HTML):</strong> ${testFileFocus.length ? testFileFocus.join(' | ') : 'لم يحدد'}</p>
+                    ${additionalNotes ? `<p><strong>ملاحظات إضافية:</strong> ${additionalNotes}</p>` : ''}
+                    <p class="text-emerald-400 font-semibold mt-3">✓ تم حفظ تفضيلاتك بنجاح في قاعدة بيانات كوتش AI!</p>
+                `;
+
+                document.getElementById('reportContent').innerHTML = reportHTML;
+                reportSection.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                alertBox.className = "p-4 rounded-xl text-sm font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation ml-1"></i> حدث خطأ أثناء حفظ الاستبيان: ${err.message}`;
+                alertBox.classList.remove('hidden');
+            } finally {
+                surveyBtn.disabled = false;
+            }
+        });
+
+        function copyReport() {
+            const text = document.getElementById('reportContent').innerText;
+            navigator.clipboard.writeText(text);
+            alert("تم نسخ تقرير الاستبيان بنجاح!");
+        }
+
+        function downloadReportHTML() {
+            const content = `<html><body style="font-family:sans-serif; direction:rtl; padding:20px; background:#0f172a; color:#f8fafc;">${document.getElementById('reportContent').innerHTML}</body></html>`;
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `تقرير_استبيان_كوتش_${userName}.html`;
+            link.click();
+        }
+    </script>
+</body>
+</html>

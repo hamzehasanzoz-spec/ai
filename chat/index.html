@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كوتش AI | غرفة المحادثة والمراجعة الطبية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #070b14 0%, #111827 50%, #064e3b 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen p-3 sm:p-6 max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <header class="glass-panel rounded-2xl p-4 flex items-center justify-between gap-4 mb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
+                🩺
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
+                    كوتش AI الطبي
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">متصل الآن</span>
+                </h1>
+                <p id="studentBadge" class="text-xs text-slate-300">جاري تحميل بيانات الطالب...</p>
+            </div>
+        </div>
+        <a href="survey.html" class="px-3 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i>
+            <span class="hidden sm:inline">تعديل الاستبيان</span>
+        </a>
+    </header>
+
+    <!-- Chat Container -->
+    <main id="chatBox" class="glass-panel flex-1 rounded-2xl p-4 overflow-y-auto space-y-4 custom-scrollbar text-sm leading-relaxed">
+        <!-- Welcome Message -->
+        <div class="p-4 rounded-xl bg-sky-950/60 border border-sky-800/50 text-sky-200 space-y-2">
+            <div class="font-bold flex items-center gap-2 text-sky-400">
+                <i class="fa-solid fa-robot"></i> كوتش AI:
+            </div>
+            <p>أهلاً بك يا دكتور! لقد قرأت بياناتك وتفضيلاتك الدراسية. أنا جاهز تماماً لمساعدتك في التحضير للامتحان الوطني الموحد للطب البشري وفقاً للكتل التي حددتها.</p>
+            <p class="text-xs text-sky-300/80">💡 تلميح: يمكنك أن تطلب مني شرح أي حالة سريرية، أو حل أسئلة دورات، أو توضيح التفرقة بين مرضين متشابهين.</p>
+        </div>
+    </main>
+
+    <!-- Input Section -->
+    <footer class="mt-4">
+        <div class="glass-panel rounded-2xl p-2 flex items-center gap-2">
+            <input 
+                type="text" 
+                id="userInput" 
+                placeholder="اسأل كوتش AI عن مرض، حالة سريرية، أو سؤال دورات..." 
+                class="flex-1 bg-transparent px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none"
+                onkeypress="if(event.key === 'Enter') sendMsg()"
+            >
+            <button 
+                onclick="sendMsg()" 
+                id="sendBtn" 
+                class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm transition flex items-center gap-2 shrink-0 disabled:opacity-50"
+            >
+                <span>إرسال</span>
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // جلب بيانات الطالب من LocalStorage
+        const studentName = localStorage.getItem('student_name') || 'دكتور';
+        const surveyData = JSON.parse(localStorage.getItem('coach_survey_data') || '{}');
+        
+        // تحديث شارة الطالب في أعلى الصفحة
+        const weakTopics = surveyData.weakTopics || 'جميع الكتل';
+        document.getElementById('studentBadge').innerText = `الطالب: ${studentName} | التركيز: ${weakTopics}`;
+
+        let chatHistory = [];
+
+        async function sendMsg() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const sendBtn = document.getElementById('sendBtn');
+            const msg = input.value.trim();
+
+            if (!msg) return;
+
+            // 1. عرض رسالة الطالب مباشرة
+            chatBox.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="p-3.5 rounded-2xl bg-slate-800 border border-slate-700 text-slate-100 max-w-[85%] text-right space-y-1">
+                        <div class="text-[11px] font-bold text-emerald-400">${escapeHtml(studentName)}</div>
+                        <div>${escapeHtml(msg)}</div>
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // تعطيل زر الإرسال أثناء انتظار الرد
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `<span>جاري التفكير...</span><i class="fa-solid fa-spinner fa-spin"></i>`;
+
+            try {
+                // 2. إرسال الطلب لـ API الخفي الخافص بالسيرفر
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: msg, 
+                        surveyData: surveyData, 
+                        history: chatHistory 
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'حدث خطأ في الاتصال بالمحرك');
+
+                // حفظ سياق المحادثة للذاكرة
+                chatHistory.push({ role: 'user', content: msg });
+                chatHistory.push({ role: 'assistant', content: data.reply });
+
+                // 3. عرض رد كوتش AI
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="p-4 rounded-2xl bg-sky-950/70 border border-sky-800/60 text-sky-100 max-w-[88%] text-right space-y-2">
+                            <div class="text-[11px] font-bold text-sky-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-robot"></i> كوتش AI
+                            </div>
+                            <div>${formatReply(data.reply)}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="p-3.5 rounded-2xl bg-rose-950/80 border border-rose-800/60 text-rose-200 text-right text-xs">
+                            <strong>خطأ:</strong> ${escapeHtml(err.message)}
+                        </div>
+                    </div>
+                `;
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<span>إرسال</span><i class="fa-solid fa-paper-plane"></i>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, function(m) { 
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]; 
+            });
+        }
+
+        function formatReply(text) {
+            return text
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+    </script>
+</body>
+</html>
